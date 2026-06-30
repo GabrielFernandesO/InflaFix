@@ -1,0 +1,26 @@
+{
+  "name": "inflafix",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Calculadora de renda fixa pós-fixada a 100% do CDI vs. inflação — Next.js, dados ao vivo do Banco Central.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "verificar": "tsx scripts/verificar.ts",
+    "verificar:hist": "tsx scripts/verificar-historico.ts"
+  },
+  "dependencies": {
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}
