@@ -332,10 +332,12 @@ function Resultado({ res }: { res: HistoricoResposta }) {
         </Linha>
         <Badge acima={r.acimaDaInflacao} />
         <p className="nota-margem">
-          Pode haver diferença de <b>~0,1%–0,2%</b> em relação ao saldo no
-          app/extrato do seu banco: arredondamento do CDI diário, a convenção de
-          quando cada aporte começa a render (D+1) e o CDI do mês corrente, que
-          ainda não fechou.
+          Os valores são uma <b>estimativa</b>, uma base de referência — não um
+          número exato. Pequenas diferenças em relação ao saldo no app/extrato do
+          seu banco são normais (arredondamento do CDI diário, quando cada aporte
+          começa a render e o mês corrente que ainda não fechou). E como a{" "}
+          <b>inflação é volátil e imprevisível</b>, use o resultado como
+          indicativo para acompanhar a tendência, não como valor fechado.
         </p>
       </div>
 
