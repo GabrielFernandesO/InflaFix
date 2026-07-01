@@ -5,14 +5,16 @@ export function Linha({
   children,
   forte,
   sub,
+  cls,
 }: {
   rot: ReactNode;
   children: ReactNode;
   forte?: boolean;
   sub?: boolean;
+  cls?: string;
 }) {
   return (
-    <div className={`linha${forte ? " forte" : ""}${sub ? " sub" : ""}`}>
+    <div className={`linha${forte ? " forte" : ""}${sub ? " sub" : ""}${cls ? ` ${cls}` : ""}`}>
       <span className="rot">{rot}</span>
       <span className="val">{children}</span>
     </div>

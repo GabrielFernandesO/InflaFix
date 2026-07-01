@@ -213,7 +213,7 @@ body {
 
 /* ---------- Layout ---------- */
 .wrap {
-  max-width: 760px;
+  max-width: 820px;
   margin: 0 auto;
   padding: 30px 16px 56px;
 }
@@ -730,6 +730,70 @@ button {
   line-height: 1.5;
 }
 .nota-margem b {
+  color: var(--tinta);
+}
+
+/* ---------- Resultado: grupos, resgate e veredito ---------- */
+.grupo-label {
+  margin: 22px 0 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--tinta2);
+}
+.linha.resgate {
+  background: var(--verde-bg);
+  border: 1px solid #d3dcef;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  align-items: center;
+}
+.linha.resgate .rot {
+  color: var(--tinta);
+  font-weight: 600;
+}
+.linha.resgate .val {
+  font-size: 1.28rem;
+  color: var(--brand);
+}
+.linha.meta {
+  align-items: center;
+}
+.veredito {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--linha);
+}
+.veredito.up {
+  background: #edf9f1;
+  border-color: #c7e8d3;
+}
+.veredito.down {
+  background: #fdf0f0;
+  border-color: #f4cccc;
+}
+.veredito .badge {
+  margin-top: 0;
+  margin-bottom: 11px;
+}
+.veredito .badge.up {
+  background: var(--acima);
+  color: #fff;
+}
+.veredito .badge.down {
+  background: var(--vermelho);
+  color: #fff;
+}
+.veredito p {
+  margin: 0;
+  font-size: 0.93rem;
+  line-height: 1.6;
+  color: var(--tinta);
+}
+.veredito p b {
   color: var(--tinta);
 }
 

@@ -263,6 +263,49 @@ function CarregandoResultado() {
   );
 }
 
+function Veredito({ r }: { r: HistoricoResposta["resumo"] }) {
+  const meta = r.totalCorrigidoIpca;
+  const brutoDelta = r.saldoBruto - meta;
+  const liqDelta = r.valorLiquidoResgate - meta;
+  const brutoPct = meta > 0 ? Math.abs(brutoDelta) / meta : 0;
+  const liqPct = meta > 0 ? Math.abs(liqDelta) / meta : 0;
+  const palavra = (d: number) => (d >= 0 ? "acima" : "abaixo");
+
+  return (
+    <div className={`veredito ${r.acimaDaInflacao ? "up" : "down"}`}>
+      <Badge acima={r.acimaDaInflacao} />
+      <p>
+        Considerando um <b>rendimento bruto de {brl(r.rendimentoBruto)}</b> e um{" "}
+        <b>rendimento líquido de {brl(r.rendimentoLiquido)}</b> (já com o IR
+        descontado): seu saldo bruto está{" "}
+        <b>
+          {pct(brutoPct)} {palavra(brutoDelta)}
+        </b>{" "}
+        da linha de empate com a inflação (<b>{brl(meta)}</b>) e o líquido,{" "}
+        {liqDelta >= 0 ? "mesmo após o imposto, " : ""}
+        <b>
+          {pct(liqPct)} {palavra(liqDelta)}
+        </b>
+        .{" "}
+        {r.ganhoReal >= 0 ? (
+          <>
+            Na prática, seu{" "}
+            <b>ganho real de poder de compra é {brl(r.ganhoReal)}</b>.
+          </>
+        ) : (
+          <>
+            Na prática, houve uma{" "}
+            <b>
+              perda real de poder de compra de {brl(Math.abs(r.ganhoReal))}
+            </b>
+            .
+          </>
+        )}
+      </p>
+    </div>
+  );
+}
+
 function Resultado({ res }: { res: HistoricoResposta }) {
   const r = res.resumo;
   return (
@@ -277,7 +320,7 @@ function Resultado({ res }: { res: HistoricoResposta }) {
           <b>{brl(r.saldoBruto)}</b>
         </div>
         <div className="chip">
-          <span>Rendimento</span>
+          <span>Rendimento bruto</span>
           <b className="pos">{brl(r.rendimentoBruto)}</b>
         </div>
         <div className="chip">
@@ -301,10 +344,13 @@ function Resultado({ res }: { res: HistoricoResposta }) {
           <h2>Resultado</h2>
         </div>
         <div className="sec-sub">
-          Aportes corrigidos pela inflação real do período (IPCA até {r.ipcaRef}).
+          Do quanto você juntou ao quanto sobra de verdade — já descontando
+          imposto e a inflação do período (IPCA até {r.ipcaRef}).
         </div>
-        <Linha rot="Total aportado">{brl(r.totalAportado)}</Linha>
-        <Linha rot="Saldo bruto hoje (o que aparece no extrato)" forte>
+
+        <div className="grupo-label">O seu dinheiro</div>
+        <Linha rot="Total aportado no período">{brl(r.totalAportado)}</Linha>
+        <Linha rot="Saldo bruto hoje (o que aparece no extrato)">
           {brl(r.saldoBruto)}
         </Linha>
         <Linha rot="Rendimento bruto">
@@ -323,26 +369,45 @@ function Resultado({ res }: { res: HistoricoResposta }) {
         <Linha rot={`IR — ${pct(r.irAliquota)} (faixa: ${r.irFaixa})`} sub>
           − {brl(r.ir)}
         </Linha>
-        <Linha rot="Resgatando hoje, recebe" forte>
-          {brl(r.valorLiquidoResgate)}
+        <Linha rot="Rendimento líquido (já com o IR descontado)">
+          <span className={r.rendimentoLiquido >= 0 ? "pos" : "neg"}>
+            {brl(r.rendimentoLiquido)}
+          </span>
         </Linha>
         <Linha
+          cls="resgate"
           rot={
             <>
-              Para empatar com a inflação
+              Resgatando hoje, recebe
               <span className="rot-hint">
-                Quanto seus aportes precisam valer hoje só para não perder poder
-                de compra (corrigidos pelo IPCA do período)
+                Total aportado + rendimento líquido
               </span>
             </>
           }
+          forte
+        >
+          {brl(r.valorLiquidoResgate)}
+        </Linha>
+
+        <div className="grupo-label">Frente à inflação</div>
+        <Linha
+          cls="meta"
+          rot={
+            <>
+              Total aportado corrigido pelo IPCA
+              <span className="rot-hint">
+                Valor que seria necessário hoje só para não perder dinheiro —
+                o empate com a inflação
+              </span>
+            </>
+          }
+          forte
         >
           {brl(r.totalCorrigidoIpca)}
         </Linha>
-        <Linha rot="Ganho real de poder de compra" forte>
-          <span className={r.ganhoReal >= 0 ? "pos" : "neg"}>{brl(r.ganhoReal)}</span>
-        </Linha>
-        <Badge acima={r.acimaDaInflacao} />
+
+        <Veredito r={r} />
+
         <p className="nota-margem">
           Os valores são uma <b>estimativa</b>, uma base de referência — não um
           número exato. Pequenas diferenças em relação ao saldo no app/extrato do
@@ -359,7 +424,7 @@ function Resultado({ res }: { res: HistoricoResposta }) {
           <h2>Mês a mês</h2>
         </div>
         <div className="sec-sub">
-          CDI (bruto) vs. IPCA de cada mês — ✓ = bateu a inflação no mês. Meses
+          CDI (bruto) vs. IPCA de cada mês — ▲ = venceu a inflação no mês. Meses
           de entrada/saída são parciais.
         </div>
         <div className="tabela-wrap">
