@@ -682,6 +682,16 @@ button {
   font-size: 0.86rem;
   opacity: 0.85;
 }
+.rot-hint {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.76rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--tinta2);
+  opacity: 0.8;
+  max-width: 46ch;
+}
 .linha.forte .val {
   font-size: 1.15rem;
 }

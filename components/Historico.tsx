@@ -326,7 +326,19 @@ function Resultado({ res }: { res: HistoricoResposta }) {
         <Linha rot="Resgatando hoje, recebe" forte>
           {brl(r.valorLiquidoResgate)}
         </Linha>
-        <Linha rot="Aportes corrigidos pela inflação">{brl(r.totalCorrigidoIpca)}</Linha>
+        <Linha
+          rot={
+            <>
+              Para empatar com a inflação
+              <span className="rot-hint">
+                Quanto seus aportes precisam valer hoje só para não perder poder
+                de compra (corrigidos pelo IPCA do período)
+              </span>
+            </>
+          }
+        >
+          {brl(r.totalCorrigidoIpca)}
+        </Linha>
         <Linha rot="Ganho real de poder de compra" forte>
           <span className={r.ganhoReal >= 0 ? "pos" : "neg"}>{brl(r.ganhoReal)}</span>
         </Linha>
