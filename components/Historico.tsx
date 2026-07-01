@@ -309,7 +309,7 @@ function Veredito({ r }: { r: HistoricoResposta["resumo"] }) {
         <b>
           {rb.nome} real de poder de compra de {rb.val}
         </b>
-        ; já com o IR descontado — o que de fato sobra no seu bolso — o{" "}
+        ; e — o que de fato sobra no seu bolso, já com o IR descontado — o{" "}
         <b>
           {rl.nome} real é de {rl.val}
         </b>
