@@ -179,13 +179,23 @@ export default function Historico() {
 
           {modalidade === "variavel" && (
             <div className="ap-list">
-              {aportes.map((a, i) => (
+              {aportes.map((a, i) => {
+                // Trava em cascata: cada aporte não pode ser anterior ao aporte
+                // de cima. min = data mais recente já preenchida nas linhas acima.
+                const minData = aportes
+                  .slice(0, i)
+                  .map((x) => x.data)
+                  .filter(Boolean)
+                  .sort()
+                  .pop();
+                return (
                 <div className="ap-row" key={a.id}>
                   <div className="ap-campo">
                     <label>{i === 0 ? "Data do primeiro aporte" : "Data do aporte"}</label>
                     <input
                       type="date"
                       className="ap-data"
+                      min={minData}
                       max={hojeISO}
                       value={a.data}
                       onChange={(e) => setAporte(a.id, "data", e.target.value)}
@@ -208,7 +218,8 @@ export default function Historico() {
                     ×
                   </button>
                 </div>
-              ))}
+                );
+              })}
               <button type="button" className="ap-add" onClick={addAporte}>
                 + Adicionar aporte
               </button>
@@ -270,6 +281,13 @@ function Veredito({ r }: { r: HistoricoResposta["resumo"] }) {
   const brutoPct = meta > 0 ? Math.abs(brutoDelta) / meta : 0;
   const liqPct = meta > 0 ? Math.abs(liqDelta) / meta : 0;
   const palavra = (d: number) => (d >= 0 ? "acima" : "abaixo");
+  // Ganho/perda real em R$: pelo saldo bruto e pelo que sobra após o IR (líquido).
+  const real = (v: number) =>
+    v >= 0
+      ? { nome: "ganho", val: brl(v) }
+      : { nome: "perda", val: brl(Math.abs(v)) };
+  const rb = real(brutoDelta);
+  const rl = real(liqDelta);
 
   return (
     <div className={`veredito ${r.acimaDaInflacao ? "up" : "down"}`}>
@@ -287,20 +305,15 @@ function Veredito({ r }: { r: HistoricoResposta["resumo"] }) {
           {pct(liqPct)} {palavra(liqDelta)}
         </b>
         .{" "}
-        {r.ganhoReal >= 0 ? (
-          <>
-            Na prática, seu{" "}
-            <b>ganho real de poder de compra é {brl(r.ganhoReal)}</b>.
-          </>
-        ) : (
-          <>
-            Na prática, houve uma{" "}
-            <b>
-              perda real de poder de compra de {brl(Math.abs(r.ganhoReal))}
-            </b>
-            .
-          </>
-        )}
+        Na prática, pelo saldo bruto há um{" "}
+        <b>
+          {rb.nome} real de poder de compra de {rb.val}
+        </b>
+        ; já com o IR descontado — o que de fato sobra no seu bolso — o{" "}
+        <b>
+          {rl.nome} real é de {rl.val}
+        </b>
+        .
       </p>
     </div>
   );
