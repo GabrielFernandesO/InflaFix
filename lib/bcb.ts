@@ -143,20 +143,35 @@ const SGS_IPCA_MES = 433; // IPCA - variação mensal (%)
 const primeiroDiaMes = (d: Date) =>
   new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
 
+// O SGS limita a série diária a ~10 anos por requisição (acima disso devolve
+// HTTP 406). Para períodos longos, quebramos em janelas e concatenamos.
+const JANELA_CDI_DIAS = 3600; // ~9,8 anos — margem segura abaixo do limite
+const DIA_MS = 86_400_000;
+
 /** Fatores diários do CDI (um por dia útil) no período: (1 + CDI_a.a.)^(1/252). */
 export async function cdiDiarioFatores(
   inicio: Date,
   fim: Date,
 ): Promise<{ data: Date; fator: number }[] | null> {
-  const url =
-    `${BASE}.${SGS_CDI}/dados?formato=json` +
-    `&dataInicial=${fmtBR(inicio)}&dataFinal=${fmtBR(fim)}`;
-  const data = await buscarJson(url, TTL_SERIE);
-  if (!Array.isArray(data)) return null;
-  return (data as { data: string; valor: string }[]).map((x) => {
-    const anual = parseFloat(String(x.valor).replace(",", ".")) / 100;
-    return { data: parseBC(String(x.data)), fator: (1 + anual) ** (1 / 252) };
-  });
+  const out: { data: Date; fator: number }[] = [];
+  let janelaIni = new Date(inicio);
+  while (janelaIni.getTime() <= fim.getTime()) {
+    const janelaFim = new Date(
+      Math.min(fim.getTime(), janelaIni.getTime() + JANELA_CDI_DIAS * DIA_MS),
+    );
+    const url =
+      `${BASE}.${SGS_CDI}/dados?formato=json` +
+      `&dataInicial=${fmtBR(janelaIni)}&dataFinal=${fmtBR(janelaFim)}`;
+    const data = await buscarJson(url, TTL_SERIE);
+    if (!Array.isArray(data)) return null; // BC fora ou período sem cotação
+    for (const x of data as { data: string; valor: string }[]) {
+      const anual = parseFloat(String(x.valor).replace(",", ".")) / 100;
+      out.push({ data: parseBC(String(x.data)), fator: (1 + anual) ** (1 / 252) });
+    }
+    if (janelaFim.getTime() >= fim.getTime()) break;
+    janelaIni = new Date(janelaFim.getTime() + DIA_MS); // próximo dia
+  }
+  return out;
 }
 
 /** IPCA mensal (decimal) por mês "YYYY-MM" no período. */
